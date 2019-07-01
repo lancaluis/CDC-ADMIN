@@ -25,7 +25,7 @@ class App extends React.Component {
             return <WeatherDisplay lat={this.state.lat} />
         }
         
-        return <Spinner message="Precisamos da sua localização" />;
+        return <Spinner message="Precisamos de sua localização" />;
 
     }
 
