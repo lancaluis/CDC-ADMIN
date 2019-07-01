@@ -1,0 +1,22 @@
+.weather-display {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.weather-display.summer i {
+    color: #f14c4c;
+}
+
+.weather-display.winter i {
+    color: #6363ec;
+}
+
+.winter {
+    background-color: aliceblue;
+}
+
+.summer {
+    background-color: #fac86b;
+}
