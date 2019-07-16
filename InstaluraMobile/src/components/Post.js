@@ -5,6 +5,7 @@ import {
     Dimensions,
     View,
     StyleSheet,
+    TextInput,
     TouchableOpacity,
 } from 'react-native';
 
@@ -15,7 +16,8 @@ export default class Post extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            foto: { ...this.props.foto, likers: [{}] }
+            foto: this.props.foto,
+            valorComentario: ''
         }
     }
 
@@ -24,13 +26,24 @@ export default class Post extends Component {
     }
 
     like() {
-        const fotoAtt = {
-            ...this.state.foto,
-            liked: !this.state.foto.liked
+        const { foto } = this.state;
+        let novaLista = [];
+        if (!foto.liked) {
+            novaLista = [
+                ...foto.likers,
+                { login: 'meuUsuario' }
+            ]
+        } else {
+            novaLista = foto.likers.filter(liker => {
+                return liker.login !== 'meuUsuario'
+            })
         }
-        this.setState({
-            foto: fotoAtt
-        })
+        const fotoAtt = {
+            ...foto,
+            liked: !foto.liked,
+            likers: novaLista
+        }
+        this.setState({ foto: fotoAtt })
     }
 
     exibeLikes(likers) {
@@ -42,7 +55,7 @@ export default class Post extends Component {
     }
 
     exibeLegenda(foto) {
-        if(foto.comentario === '')
+        if (foto.comentario === '')
             return;
         return (
             <View style={styles.comentario}>
@@ -50,6 +63,25 @@ export default class Post extends Component {
                 <Text>{foto.comentario}</Text>
             </View>
         )
+    }
+
+    addComentario() {
+        if (this.state.valorComentario === '')
+            return
+
+        const novaLista = [...this.state.foto.comentarios, {
+            id: this.state.valorComentario,
+            login: 'meuUsuario',
+            texto: this.state.valorComentario
+        }];
+
+        const fotoAtt = {
+            ...this.state.foto,
+            comentarios: novaLista
+        }
+
+        this.setState({ foto: fotoAtt, valorComentario: '' });
+        this.inputComentario.clear();
     }
 
     render() {
@@ -74,6 +106,24 @@ export default class Post extends Component {
 
                     {this.exibeLikes(foto.likers)}
                     {this.exibeLegenda(foto)}
+
+                    {foto.comentarios.map(comentario =>
+                        <View style={styles.comentario} key={comentario.id}>
+                            <Text style={styles.tituloComentario}>{comentario.login}</Text>
+                            <Text>{comentario.texto}</Text>
+                        </View>
+                    )}
+
+                    <View style={styles.novoComentario}>
+                        <TextInput style={styles.input}
+                            placeholder="Adicione um comentário"
+                            ref={input => this.inputComentario = input}
+                            onChangeText={texto => this.setState({ valorComentario: texto })} />
+                        <TouchableOpacity onPress={this.addComentario.bind(this)}>
+                            <Image style={styles.icone}
+                                source={require('../../resources/images/send.png')} />
+                        </TouchableOpacity>
+                    </View>
 
                 </View>
             </View>
@@ -112,8 +162,26 @@ const styles = StyleSheet.create({
     comentario: {
         flexDirection: 'row'
     },
+    tituloComentario: {
+        fontWeight: 'bold',
+        marginRight: 5
+    },
     userComent: {
         fontWeight: 'bold',
         marginRight: 5
+    },
+    input: {
+        flex: 1,
+        height: 40
+    },
+    icone: {
+        width: 20,
+        height: 20
+    },
+    novoComentario: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderBottomWidth: 1,
+        borderBottomColor: '#ddd'
     }
 });
